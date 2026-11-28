@@ -75,7 +75,7 @@ private:
 	 *
 	 * Same as @ref Ratio, but instead of representing the Base bytes, it represents the entire value held by @ref taiCounter.
 	 */
-	using RawRatio = std::ratio<Num, Denom * 1UL << (8 * FractionBytes)>; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	using RawRatio = std::ratio<Num, Denom * 1ULL << (8 * FractionBytes)>; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 	/**
 	 * An std::chrono::duration representation of the base type (without the fractional part)

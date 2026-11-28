@@ -7,7 +7,7 @@
 #include "Helpers/PacketStore.hpp"
 #include "PacketSelectionSubservice.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -40,11 +40,16 @@ public:
 	 */
 	TimeStampType timeStamping = PacketBased;
 
+	/**
+	 * The packet selection sub-service of the Storage and Retrieval service.
+	 */
+	PacketSelectionSubservice packetSelection{*this};
+
 private:
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
+	etl::flat_map<PacketStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
 	 * Appends a telemetry packet to the packet store, respecting the packet store type: when a circular packet
@@ -64,7 +69,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const PacketStoreId& packetStoreId, Time::DefaultCUC timeLimit);
+	void deleteContentUntil(const PacketStoreId& packetStoreId, const Time::DefaultCUC& timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -106,7 +111,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request);
+	static bool checkTimeWindow(const Time::DefaultCUC& startTime, const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -127,8 +132,8 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, Time::DefaultCUC startTime,
-	                             Time::DefaultCUC endTime, const Message& request);
+	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, const Time::DefaultCUC& startTime,
+	                             const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Checks if there are no stored Time::DefaultCUC that fall between the two specified time-tags.
@@ -138,7 +143,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, Time::DefaultCUC timeTag,
+	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, const Time::DefaultCUC& timeTag,
 	                             const Message& request, bool isAfterTimeTag);
 
 	/**
@@ -150,8 +155,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const PacketStoreId& fromPacketStoreId,
-	                        const PacketStoreId& toPacketStoreId, Time::DefaultCUC startTime,
-	                        Time::DefaultCUC endTime, const Message& request);
+	                        const PacketStoreId& toPacketStoreId, const Time::DefaultCUC& startTime,
+	                        const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -162,7 +167,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const PacketStoreId& fromPacketStoreId,
-	                        const PacketStoreId& toPacketStoreId, Time::DefaultCUC startTime,
+	                        const PacketStoreId& toPacketStoreId, const Time::DefaultCUC& startTime,
 	                        const Message& request);
 
 	/**
@@ -174,7 +179,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const PacketStoreId& fromPacketStoreId,
-	                         const PacketStoreId& toPacketStoreId, Time::DefaultCUC endTime,
+	                         const PacketStoreId& toPacketStoreId, const Time::DefaultCUC& endTime,
 	                         const Message& request);
 
 	/**
@@ -196,11 +201,6 @@ private:
 	void initializeStorageAndRetrievalServiceStructures();
 
 public:
-	/**
-	 * The packet selection sub-service of the Storage and Retrieval service.
-	 */
-	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(*this);
-	
 	inline static constexpr ServiceTypeNum ServiceType = 15;
 
 	enum MessageType : uint8_t {
@@ -254,7 +254,7 @@ public:
 	 * store does not exist, its storage is disabled, or its storage-control configuration excludes the message.
 	 */
 	void addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
-	message, Time::DefaultCUC timestamp);
+	message, const Time::DefaultCUC& timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.

@@ -1,41 +1,37 @@
+#include <limits>
 #include "Helpers/AppProcessConfiguration.hpp"
 #include "Helpers/AllReportTypes.hpp"
 #include "Message.hpp"
 #include "etl/algorithm.h"
 
-void ApplicationProcessConfiguration::addAllReportsOfApplication(const Message& message, ApplicationProcessId applicationID) {
+void ApplicationProcessConfiguration::addAllReportsOfApplication(ApplicationProcessId applicationID) {
 	for (const auto& [serviceType, reportTypes]: AllReportTypes::getMessagesOfService()) {
-		addAllReportsOfService(message, applicationID, serviceType);
+		addAllReportsOfService(applicationID, serviceType);
 	}
 }
 
-void ApplicationProcessConfiguration::addAllReportsOfService(const Message& message, ApplicationProcessId applicationID,
-    ServiceTypeNum serviceType) {
+void ApplicationProcessConfiguration::addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
 	auto serviceReportTypes = AllReportTypes::getMessagesOfService().find(serviceType);
 	if (serviceReportTypes == AllReportTypes::getMessagesOfService().end()) {
-		// Not an error: addAllReportsOfApplication iterates existing keys only, and TC-driven callers have
-		// already validated the service type (and reported NonExistentServiceTypeDefinition) via
-		// checkServiceCanBeAdded before reaching this point.
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	for (const auto& messageType: serviceReportTypes->second) {
-		checkAndAddReport(message, applicationID, serviceType, messageType);
-	}
+	definitions[AppServiceKey{applicationID, serviceType}].assign(serviceReportTypes->second.begin(),
+	    serviceReportTypes->second.end());
 }
 
-bool ApplicationProcessConfiguration::checkAndAddReport(const Message& request, ApplicationProcessId applicationID,
+void ApplicationProcessConfiguration::checkAndAddReport(const Message& request, ApplicationProcessId applicationID,
     ServiceTypeNum serviceType, MessageTypeNum messageType) {
-	if (checkMaxReportTypesReached(request, applicationID, serviceType) or
-	    checkAlreadyExistingReport(request, applicationID, serviceType, messageType)) {
-		return false;
+	if (not checkMaxReportTypesReached(request, applicationID, serviceType)) {
+		addReport(applicationID, serviceType, messageType);
 	}
-	addReport(applicationID, serviceType, messageType);
-	return true;
 }
 
 void ApplicationProcessConfiguration::addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
     MessageTypeNum messageType) {
-	definitions[AppServiceKey{applicationID, serviceType}].push_back(messageType);
+	if (not isReportTypeAdded(applicationID, serviceType, messageType)) {
+		definitions[AppServiceKey{applicationID, serviceType}].push_back(messageType);
+	}
 }
 
 uint8_t ApplicationProcessConfiguration::countServicesOfApplication(ApplicationProcessId applicationID) const {
@@ -52,31 +48,13 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 	return definition->second.size();
 }
 
-bool ApplicationProcessConfiguration::checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-    ServiceTypeNum serviceType, MessageTypeNum messageType) const {
-	if (not isReportTypeAdded(applicationID, serviceType, messageType)) {
-		return false;
-	}
-	ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
-	return true;
-}
-
 bool ApplicationProcessConfiguration::checkApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
     uint8_t numOfServices, const etl::span<const ApplicationProcessId>& controlledApplications) {
-	if ((not checkAppControlled(controlledApplications, request, applicationID)) or
-	    checkAllServiceTypesAllowed(request, applicationID)) {
+	if (not checkAppControlled(controlledApplications, request, applicationID)) {
 		skipServiceBlocks(request, numOfServices);
 		return false;
 	}
 	return true;
-}
-
-bool ApplicationProcessConfiguration::checkAllServiceTypesAllowed(const Message& request, const ApplicationProcessId applicationID) {
-	if (isMaxServiceTypesReached(applicationID)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
-		return true;
-	}
-	return false;
 }
 
 bool ApplicationProcessConfiguration::checkAppControlled(const etl::span<const ApplicationProcessId>& controlledApplications,
@@ -108,7 +86,7 @@ bool ApplicationProcessConfiguration::checkServiceCanBeAdded(Message& request, A
 		skipReportTypes(request, numOfMessages);
 		return false;
 	}
-	if (checkMaxServiceTypesReached(request, applicationID) and (not isServiceAdded(applicationID, serviceType))) {
+	if ((not isServiceAdded(applicationID, serviceType)) and checkMaxServiceTypesReached(request, applicationID)) {
 		skipReportTypes(request, numOfMessages);
 		return false;
 	}
@@ -120,6 +98,7 @@ bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& 
     ServiceTypeNum serviceType) const {
 	auto serviceReportTypes = AllReportTypes::getMessagesOfService().find(serviceType);
 	if (serviceReportTypes == AllReportTypes::getMessagesOfService().end()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return true;
 	}
 	if (countReportsOfService(applicationID, serviceType) >= serviceReportTypes->second.size()) {
@@ -159,19 +138,13 @@ bool ApplicationProcessConfiguration::checkReportTypeInConfiguration(const Messa
 }
 
 void ApplicationProcessConfiguration::deleteApplicationProcess(ApplicationProcessId applicationID) {
-	bool deletedAnyDefinition = false;
-	auto iter = definitions.begin();
-	while (iter != definitions.end()) {
-		if (iter->first.first == applicationID) {
-			iter = definitions.erase(iter);
-			deletedAnyDefinition = true;
-		} else {
-			++iter;
-		}
-	}
-	if (not deletedAnyDefinition) {
+	const auto firstDefinition = definitions.lower_bound(AppServiceKey{applicationID, std::numeric_limits<ServiceTypeNum>::min()});
+	const auto lastDefinition = definitions.upper_bound(AppServiceKey{applicationID, std::numeric_limits<ServiceTypeNum>::max()});
+	if (firstDefinition == lastDefinition) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
+		return;
 	}
+	definitions.erase(firstDefinition, lastDefinition);
 }
 
 void ApplicationProcessConfiguration::deleteServiceType(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
@@ -188,14 +161,12 @@ void ApplicationProcessConfiguration::deleteReportType(ApplicationProcessId appl
 		return;
 	}
 	auto& reportTypes = definition->second;
-	auto* const reportTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
-	if (reportTypeIndex == reportTypes.end()) {
+	if (etl::erase(reportTypes, messageType) == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	reportTypes.erase(reportTypeIndex);
 	if (reportTypes.empty()) {
-		deleteServiceType(applicationID, serviceType);
+		definitions.erase(definition);
 	}
 }
 
@@ -216,6 +187,34 @@ bool ApplicationProcessConfiguration::isReportTypeAdded(ApplicationProcessId app
 		return false;
 	}
 	return etl::find(definition->second.begin(), definition->second.end(), messageType) != definition->second.end();
+}
+
+void ApplicationProcessConfiguration::appendContentToReport(Message& report) const {
+	uint8_t numberOfApplications = 0;
+	ApplicationProcessId previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		if (appServiceKey.first != previousAppID) {
+			previousAppID = appServiceKey.first;
+			numberOfApplications++;
+		}
+	}
+	report.appendUint8(numberOfApplications);
+
+	previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		const ApplicationProcessId applicationID = appServiceKey.first;
+		if (applicationID != previousAppID) {
+			previousAppID = applicationID;
+			report.append<ApplicationProcessId>(applicationID);
+			report.appendUint8(countServicesOfApplication(applicationID));
+		}
+
+		report.append<ServiceTypeNum>(appServiceKey.second);
+		report.appendUint8(reportTypes.size());
+		for (const auto& messageType: reportTypes) {
+			report.append<MessageTypeNum>(messageType);
+		}
+	}
 }
 
 void ApplicationProcessConfiguration::skipReportTypes(Message& request, uint8_t numOfMessages) {

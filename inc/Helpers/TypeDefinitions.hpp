@@ -10,7 +10,7 @@ using NumberOfEventActionDefinitions = uint8_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
 using SamplingInterval = uint16_t;
-using StartAddress = uint64_t;
+using MemoryAddress = uint32_t;
 using MemoryId = uint8_t;
 using ReadData = uint8_t;
 using MemoryManagementChecksum = uint16_t;
@@ -38,7 +38,10 @@ using ApplicationProcessId = uint16_t;
 using ServiceTypeNum = uint8_t;
 using MessageTypeNum = uint8_t;
 
-using SourceId = uint16_t;
+/**
+ * The type used for both the source and destination IDs of a TC or TM message respectively (see 5.4.2.1d/e)
+ */
+using ApplicationProcessUserId = uint16_t;
 using SequenceCount = uint16_t;
 /**
  * Filling percentages of the packet stores, either total or from the open retrieval start time tag.

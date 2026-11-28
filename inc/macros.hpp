@@ -3,11 +3,12 @@
 
 /**
  * Perform an assertion that, if failed, throws an ErrorHandler::Internal error
+ * and logs the source filename and line.
  *
  * @todo (#134) Actually hold program execution or throw an exception here
  */
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ASSERT_INTERNAL(cond, error) (ErrorHandler::assertInternal((cond), (error)))
+#define ASSERT_INTERNAL(cond, error) (ErrorHandler::assertInternal((cond), (error), __FILE__, __LINE__))
 
 /**
  * A wrapper for ErrorHandler::assertRequest() that uses `this` as the Message object.

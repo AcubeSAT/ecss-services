@@ -1,4 +1,5 @@
 #include "Services/HousekeepingService.hpp"
+#include <chrono>
 #include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
@@ -19,6 +20,10 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t const numOfSimplyCommutatedParams = request.readUint16();
+	if (numOfSimplyCommutatedParams > newStructure.simplyCommutatedParameterIds.max_size()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
+		return;
+	}
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		const ParameterId newParamId = request.read<ParameterId>();
@@ -265,8 +270,12 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 }
 
 Time::DefaultCUC
-HousekeepingService::reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay) {
-	Time::DefaultCUC nextCollection((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den); // NOLINT(misc-const-correctness)
+HousekeepingService::reportPendingStructures(const Time::DefaultCUC& currentTime, const Time::DefaultCUC& previousTime, const Time::DefaultCUC& expectedDelay) {
+	Time::DefaultCUC nextDelay((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den); // NOLINT(misc-const-correctness)
+
+	const auto currentTimeMs = static_cast<uint64_t>(currentTime.asDuration<std::chrono::milliseconds>().count());
+	const auto scheduledTimeMs = static_cast<uint64_t>(previousTime.asDuration<std::chrono::milliseconds>().count()) +
+	                             static_cast<uint64_t>(expectedDelay.asDuration<std::chrono::milliseconds>().count());
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
@@ -274,25 +283,21 @@ HousekeepingService::reportPendingStructures(Time::DefaultCUC currentTime, Time:
 		}
 		if (housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
-			nextCollection = Time::DefaultCUC(0);
+			nextDelay = Time::DefaultCUC(0);
 			continue;
 		}
-		if (currentTime.asTAIseconds() != 0 and (currentTime.asTAIseconds() % housekeepingStructure.second.collectionInterval ==
-		                                             0 or
-		                                         (previousTime.asTAIseconds() + expectedDelay.asTAIseconds()) % housekeepingStructure.second
-		                                                                                                            .collectionInterval ==
-		                                             0)) {
+		if (currentTimeMs % housekeepingStructure.second.collectionInterval == 0 or
+		    scheduledTimeMs % housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
-		const Time::DefaultCUC structureTimeToCollection(housekeepingStructure.second
-		                                                     .collectionInterval -
-		                                                 currentTime.asTAIseconds() % housekeepingStructure.second.collectionInterval);
-		if (nextCollection > structureTimeToCollection) {
-			nextCollection = structureTimeToCollection;
+		const Time::DefaultCUC structureTimeToCollection(std::chrono::milliseconds(
+		    housekeepingStructure.second.collectionInterval - currentTimeMs % housekeepingStructure.second.collectionInterval));
+		if (nextDelay > structureTimeToCollection) {
+			nextDelay = structureTimeToCollection;
 		}
 	}
 
-	return nextCollection;
+	return nextDelay;
 }
 
 bool HousekeepingService::hasNonExistingStructExecutionError(ParameterReportStructureId id, const Message& request) {
@@ -359,7 +364,7 @@ bool HousekeepingService::hasRequestedDeletionOfEnabledHousekeepingError(Paramet
 }
 
 bool HousekeepingService::hasExceededMaxNumOfSimplyCommutatedParamsError(const HousekeepingStructure& housekeepingStruct, const Message& request) {
-	if (housekeepingStruct.simplyCommutatedParameterIds.size() >= ECSSMaxSimplyCommutatedParameters) {
+	if (housekeepingStruct.simplyCommutatedParameterIds.full()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
 		return true;
 	}

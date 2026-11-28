@@ -44,7 +44,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		CHECK(element->second.applicationID == 0);
 		CHECK(element->second.eventDefinitionID == 2);
 		CHECK(!element->second.enabled);
-		for (auto i = 0; i < data.size(); ++i) {
+		for (size_t i = 0; i < data.size(); ++i) {
 			CHECK(data[i] == element->second.request[i]);
 		}
 	}

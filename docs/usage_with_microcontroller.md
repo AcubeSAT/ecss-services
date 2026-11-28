@@ -287,7 +287,6 @@ Towards that goal, each platform needs to initialize their own controlledApplica
 void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() {
 	ApplicationProcessConfiguration config;
 	packetStoreAppProcessConfig.insert({"stats", config});
-	controlledApplications.push_back(ApplicationId);
 }
 
 ```
@@ -300,10 +299,17 @@ controlledApplications vector with the application processes it controls.
 
 ```cpp
 void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {
-	Message message;
-	applicationProcessConfiguration.addAllReportsOfApplication(message, ApplicationId);
-	controlledApplications.push_back(ApplicationId);
+	applicationProcessConfiguration.addAllReportsOfApplication(ApplicationId);
 }
+```
+
+ST[14] and ST[15] also keep a list of the application processes they control, in `controlledApplications`. They can only
+add report types for application processes in that list. The constructors add the application process that hosts the
+service (`ApplicationId`), which counts towards `ECSSMaxControlledApplicationProcesses`. A platform that controls other
+application processes adds them in the two functions above, so that they are added again after `Services.reset()`:
+
+```cpp
+controlledApplications.push_back(otherApplicationId);
 ```
 
 ## Receiving messages
@@ -316,3 +322,17 @@ MessageParser::parse(string, size);
 ```
 
 You can use the rest of the @ref MessageParser functions if you have a more specific use-case.
+
+8. @ref MemoryManagementService::initializeMemoryVector
+
+`initializeMemoryVector` is a function member of the class MemoryManagementService and is invoked in the constructor of the class.
+It's purpose is to initialize the memory vector that will include all the instances of the different types of memories.
+Example code using a hypothetical `TestMemory` object:
+
+```c++
+TestMemory testMemory{0, std::numeric_limits<std::uintptr_t>::max()};
+
+void MemoryManagementService::initializeMemoryVector() {
+	memoryVector.push_back(etl::ref(static_cast<Memory&>(testMemory)));
+}
+```

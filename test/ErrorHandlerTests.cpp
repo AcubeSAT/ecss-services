@@ -2,6 +2,7 @@
 #include <catch2/catch_all.hpp>
 #include "Services/RequestVerificationService.hpp"
 #include "Services/ServiceTests.hpp"
+#include "macros.hpp"
 
 TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 47);
@@ -117,4 +118,22 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownRoutingError);
+}
+
+TEST_CASE("Assertion failure logs an internal error and does not send a TM", "[errors]") {
+	REQUIRE_FALSE(ASSERT_INTERNAL(false, ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::count() == 0);
+}
+
+TEST_CASE("Passing assertion does not log or send a TM", "[errors]") {
+	REQUIRE(ASSERT_INTERNAL(true, ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::hasNoErrors());
+	CHECK(ServiceTests::count() == 0);
+}
+
+TEST_CASE("Internal error logs basename and line", "[errors]") {
+	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError, "src/Time/UTCTimestamp.cpp", 9);
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::lastLog.find("UTCTimestamp.cpp:9") != std::string::npos);
 }

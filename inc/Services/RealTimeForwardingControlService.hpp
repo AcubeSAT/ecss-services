@@ -30,11 +30,13 @@ public:
 
 	RealTimeForwardingControlService() {
 		serviceType = ServiceType;
+		controlledApplications.push_back(ApplicationId);
 		initializeRealTimeForwardingServiceStructures();
 	}
 
 	/**
-	 * Contains the Application IDs, controlled by the Service.
+	 * Contains the Application IDs, controlled by the Service. It always contains the application process that hosts
+	 * the Service, as specified in ECSS 6.14.3.1.1a. The platform initialization code adds any others.
 	 */
 	etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 

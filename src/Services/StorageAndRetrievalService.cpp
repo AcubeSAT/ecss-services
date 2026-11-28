@@ -1,13 +1,11 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 PacketStoreId StorageAndRetrievalService::readPacketStoreId(Message& message) {
-	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
-	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
-	return packetStoreId.data();
+	return message.readFixedString<ECSSPacketStoreIdSize>();
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const PacketStoreId& packetStoreId,
-                                                    Time::DefaultCUC timeLimit) {
+                                                    const Time::DefaultCUC& timeLimit) {
 	auto& telemetryPackets = packetStores[packetStoreId].storedTelemetryPackets;
 	while (not telemetryPackets.empty() and telemetryPackets.front().first <= timeLimit) {
 		telemetryPackets.pop_front();
@@ -83,7 +81,7 @@ bool StorageAndRetrievalService::checkPacketStores(const PacketStoreId& fromPack
 	return true;
 }
 
-bool StorageAndRetrievalService::checkTimeWindow(Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
+bool StorageAndRetrievalService::checkTimeWindow(const Time::DefaultCUC& startTime, const Time::DefaultCUC& endTime, const Message& request) {
 	if (startTime >= endTime) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return true;
@@ -101,7 +99,7 @@ bool StorageAndRetrievalService::checkDestinationPacketStore(const PacketStoreId
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId,
-                                                         Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
+                                                         const Time::DefaultCUC& startTime, const Time::DefaultCUC& endTime, const Message& request) {
 	if (endTime < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first ||
 	    startTime > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -111,7 +109,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const PacketStoreId& fr
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId,
-                                                         Time::DefaultCUC timeTag, const Message& request, bool isAfterTimeTag) {
+                                                         const Time::DefaultCUC& timeTag, const Message& request, bool isAfterTimeTag) {
 	if (isAfterTimeTag) {
 		if (timeTag > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -126,7 +124,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const PacketStoreId& fr
 
 bool StorageAndRetrievalService::failedFromTagToTag(const PacketStoreId& fromPacketStoreId,
                                                     const PacketStoreId& toPacketStoreId,
-                                                    Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
+                                                    const Time::DefaultCUC& startTime, const Time::DefaultCUC& endTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkTimeWindow(startTime, endTime, request) or checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
@@ -134,7 +132,7 @@ bool StorageAndRetrievalService::failedFromTagToTag(const PacketStoreId& fromPac
 
 bool StorageAndRetrievalService::failedAfterTimeTag(const PacketStoreId& fromPacketStoreId,
                                                     const PacketStoreId& toPacketStoreId,
-                                                    Time::DefaultCUC startTime, const Message& request) {
+                                                    const Time::DefaultCUC& startTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
@@ -142,7 +140,7 @@ bool StorageAndRetrievalService::failedAfterTimeTag(const PacketStoreId& fromPac
 
 bool StorageAndRetrievalService::failedBeforeTimeTag(const PacketStoreId& fromPacketStoreId,
                                                      const PacketStoreId& toPacketStoreId,
-                                                     Time::DefaultCUC endTime, const Message& request) {
+                                                     const Time::DefaultCUC& endTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
@@ -228,7 +226,7 @@ void StorageAndRetrievalService::storeTelemetry(const Message& message, Time::De
 }
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
-	message, Time::DefaultCUC timestamp) {
+	message, const Time::DefaultCUC& timestamp) {
 	const auto packetStoreIterator = packetStores.find(packetStoreId);
 	if (packetStoreIterator == packetStores.end()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
@@ -250,6 +248,7 @@ void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& 
 
 void StorageAndRetrievalService::resetPacketStores() {
 	packetStores.clear();
+	packetSelection.packetStoreAppProcessConfig.clear();
 }
 
 NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
@@ -258,7 +257,9 @@ NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
 
 PacketStore& StorageAndRetrievalService::getPacketStore(const PacketStoreId& packetStoreId) {
 	auto packetStore = packetStores.find(packetStoreId);
-	ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray);
+	if (not ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray)) {
+		// TODO(#59): Proper error handling if assert fails
+	}
 	return packetStore->second;
 }
 
@@ -624,6 +625,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			std::copy(idToDelete.begin(), idToDelete.end(), data.data());
 			const PacketStoreId key(data.data());
 			packetStores.erase(key);
+			packetSelection.packetStoreAppProcessConfig.erase(key);
 		}
 		return;
 	}
@@ -652,6 +654,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			continue;
 		}
 		packetStores.erase(idToDelete);
+		packetSelection.packetStoreAppProcessConfig.erase(idToDelete);
 	}
 }
 

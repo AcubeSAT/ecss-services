@@ -2,10 +2,9 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/PacketStore.hpp"
 #include "Helpers/AppProcessConfiguration.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/vector.h"
 
 class StorageAndRetrievalService;
@@ -37,16 +36,6 @@ public:
 
 private:
 	/**
-	 * Helper function that reads the packet store ID string from a TC/TM[15,x] message
-	 */
-	PacketStoreId readPacketStoreId(Message& message);
-
-	/**
-	 * Returns true if the specified packet store is present in packet stores of the main service.
-	 */
-	bool packetStoreExists(const PacketStoreId& packetStoreId);
-
-	/**
 	 * Reference to the parent Storage and Retrieval Service, used to query the existing packet stores.
 	 */
 	StorageAndRetrievalService& mainService;
@@ -64,6 +53,7 @@ public:
 	 */
 	explicit PacketSelectionSubservice(StorageAndRetrievalService& parent) : mainService(parent) {
 		serviceType = ServiceType;
+		controlledApplications.push_back(ApplicationId);
 		initializePacketSelectionSubServiceStructures();
 	}
 
@@ -72,9 +62,10 @@ public:
 	 *
 	 * @note
 	 * The subservice can only add report types to the storage-control configuration for application processes that
-	 * are contained in this vector. It is the responsibility of the platform initialization code (or the tests) to
-	 * populate it with the application process IDs that the subsystem controls, similarly to the
-	 * controlledApplications vector of the RealTimeForwardingControlService (ST[14]).
+	 * are contained in this vector. It always contains the application process that hosts the subservice, as specified
+	 * in ECSS 6.15.4.1.1a. It is the responsibility of the platform initialization code (or the tests) to add any other
+	 * application process IDs that the subsystem controls, similarly to the controlledApplications vector of the
+	 * RealTimeForwardingControlService (ST[14]).
 	 */
 	etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
@@ -86,8 +77,8 @@ public:
 	 * The size of this object is known at compile time, but it is significant: each ApplicationProcessConfiguration
 	 * holds up to ECSSMaxApplicationsServicesCombinations vectors of ECSSMaxReportTypeDefinitions message types, and
 	 * this map holds one configuration per packet store (ECSSMaxPacketStores). With the current x86 definitions
-	 * (4 packet stores, 50 app-service combinations, 20 report types), this map measures ~16.6 kB on x86-64
-	 * (sizeof(ApplicationProcessConfiguration) = 4072 bytes). Keep this in mind when adjusting those definitions
+	 * (4 packet stores, 70 app-service combinations, 20 report types), this map measures ~18.6 kB on 64-bit hosts
+	 * (sizeof(ApplicationProcessConfiguration) = 4568 bytes). Keep this in mind when adjusting those definitions
 	 * for the embedded platform.
 	 *
 	 * @note
@@ -99,7 +90,7 @@ public:
 	 * application process ID and service type already exist in the map, and the requested report type is located in the vector
 	 * of report types, which corresponds to the packet store ID, appID and service type.
 	 */
-	etl::map<PacketStoreId, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
+	etl::flat_map<PacketStoreId, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
 
 	/**
 	 * TC[15,3] 'add report types to an application process storage control configuration'.
@@ -113,7 +104,7 @@ public:
 
 	/**
 	 * This function takes a TC[15,5] request 'report the content of the application process storage control
-	 * configuration' as an argument and respond with a TM[15,6] 'application process storage-control configuration
+	 * configuration' as an argument and responds with a TM[15,6] 'application process storage-control configuration
 	 * content report'
 	 */
 	void reportApplicationProcess(Message& request);

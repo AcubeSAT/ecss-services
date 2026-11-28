@@ -2,7 +2,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
-#include "etl/optional.h"
+#include "etl/expected.h"
 #include "etl/result.h"
 
 namespace Filesystem {
@@ -47,6 +47,16 @@ namespace Filesystem {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
 		FileIsLocked = 2,
+		UnknownError = 255
+	};
+
+	/**
+	 * Possible errors returned by the filesystem during file locking/unlocking
+	 */
+	enum class FilePermissionModificationError : uint8_t {
+		FileDoesNotExist = 0,
+		PathLeadsToDirectory = 1,
+		FilePermissionModificationFailed = 2,
 		UnknownError = 255
 	};
 
@@ -139,13 +149,13 @@ namespace Filesystem {
 	 * Locks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void lockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> lockFile(const Path& path);
 
 	/**
 	 * Unlocks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void unlockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path);
 
 	/**
 	 * Gets the current file lock status

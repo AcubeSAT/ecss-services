@@ -200,8 +200,9 @@ inline constexpr uint16_t ECSSPacketStoreIdSize = 15;
 inline constexpr uint8_t ECSSMaxHousekeepingStructures = 10;
 
 /**
- * The max number of controlled application processes
+ * The max number of controlled application processes, including the one that hosts the service
  * @see RealTimeForwardingControlService
+ * @see PacketSelectionSubservice
  */
 inline constexpr uint8_t ECSSMaxControlledApplicationProcesses = 5;
 
@@ -209,7 +210,9 @@ inline constexpr uint8_t ECSSMaxControlledApplicationProcesses = 5;
  * The max number of report type blocking definitions per service type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * todo: (#27) must change when a service with more report types is implemented.
+ *
+ * @note Must be at least the number of report types of every report-generating service enabled in this build, as
+ * AllReportTypes checks at compile time.
  */
 inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
 
@@ -217,8 +220,10 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * The max number of service type definitions per application process type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * @see PacketSelectionSubService
- * todo: (#27) must change when all 15 services are implemented.
+ * @see PacketSelectionSubservice
+ *
+ * @note Must be at least the number of report-generating services enabled in this build, as AllReportTypes checks at
+ * compile time.
  */
 inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 14;
 
@@ -260,6 +265,11 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  * In the ECSS-E-ST-70-41C the application ID is also referred as application process.
  */
 inline constexpr uint16_t ApplicationId = 1;
+/**
+ * Maximum number of entries in Valid Memory IDs set
+ */
+inline constexpr uint32_t MaxValidMemoryIds = 8;
+
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

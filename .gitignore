@@ -1,6 +1,7 @@
 # Build files
 build
 cmake-build-debug
+conan-build
 
 # Documentation output
 /docs/html
@@ -91,6 +92,7 @@ cppcheck-html-report/
 ikos-report/
 clang-tidy-html-report/
 gcovr/
+service-sizes/
 
 report.xml
 clang-tidy-output.log

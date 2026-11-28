@@ -2,7 +2,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/span.h"
 #include "etl/utility.h"
 #include "etl/vector.h"
@@ -47,28 +47,28 @@ public:
 	 * This will also be used by the StorageAndRetrievalService (ST15) as a look-up table, regarding which TMs are
 	 * allowed to be stored.
 	 */
-	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+	etl::flat_map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
-	 * May report errors through checkAndAddReport for report types that cannot be added.
+	 * Existing definitions of those service types are replaced.
 	 */
-	void addAllReportsOfApplication(const Message& message, ApplicationProcessId applicationID);
+	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
-	 * Adds all report types of the specified service type, to the application process configuration.
-	 * May report errors through checkAndAddReport for report types that cannot be added.
+	 * Replaces the definition of the specified service type with all of its report types, as specified in ECSS
+	 * 6.14.3.4.1l and 6.15.4.4.1n. Reports an ElementNotInArray internal error if the service type is unknown to
+	 * AllReportTypes, since callers are expected to have validated it beforehand.
 	 */
-	void addAllReportsOfService(const Message& message, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
-	 * Checks whether the specified message type can be added to the specified application process and service type
-	 * definition, and adds it if all checks pass. Reports a MaxReportTypesReached or an AlreadyExistingReportType
-	 * error if the checks don't pass.
-	 *
-	 * @return True: if the message type passed all checks and was added to the configuration.
+	 * Adds the specified message type to the specified application process and service type definition, if it is not
+	 * already there. Reports a MaxReportTypesReached error and adds nothing if the definition is full. A message type
+	 * that already exists in a definition that is not full is not an error, as specified in ECSS 6.14.3.4.1k and
+	 * 6.15.4.4.1m.
 	 */
-	bool checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+	void checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	    MessageTypeNum messageType);
 
 	/**
@@ -84,7 +84,9 @@ public:
 	/**
 	 * Performs the necessary error checking/logging for an application process ID of an 'add report types' request.
 	 * Also, skips the necessary bytes from the request message, in case of an invalid request.
-	 * Reports a NotControlledApplication or an AllServiceTypesAlreadyAllowed error for invalid requests.
+	 * Reports a NotControlledApplication error for invalid requests. Reaching the maximum number of service types does
+	 * not invalidate the application, since it only rejects instructions that imply a new service type definition,
+	 * as specified in ECSS 6.14.3.4.1f and 6.15.4.4.1h.
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
@@ -171,20 +173,18 @@ public:
 	bool isReportTypeAdded(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	    MessageTypeNum messageType) const;
 
+	/**
+	 * Appends the content of the configuration to a TM[14,4] or TM[15,6] report: the number of application processes,
+	 * followed by each application process with its service type and report type definitions.
+	 */
+	void appendContentToReport(Message& report) const;
+
 private:
 	/**
-	 * Adds the specified report type to the application process configuration. Only called by checkAndAddReport,
-	 * after the necessary error checking has been performed.
+	 * Adds the specified report type to the application process configuration, if it is not already there. Only called
+	 * by checkAndAddReport, after the necessary error checking has been performed.
 	 */
 	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
-
-	/**
-	 * Checks if all service types are effectively allowed already, i.e. if the maximum number of service type
-	 * definitions per application process has been reached. Reports an AllServiceTypesAlreadyAllowed error if so.
-	 *
-	 * @return True: if the maximum number of service type definitions has already been reached.
-	 */
-	bool checkAllServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service.
@@ -205,21 +205,13 @@ private:
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
-	 * Reports a MaxReportTypesReached error if it is.
+	 * Reports a MaxReportTypesReached error if it is, or an ElementNotInArray internal error if the service type is
+	 * unknown to AllReportTypes, since callers are expected to have validated it beforehand.
 	 *
 	 * @return True: if the maximum number of report type definitions has already been reached.
 	 */
 	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
 	    ServiceTypeNum serviceType) const;
-
-	/**
-	 * Checks whether the specified message type already exists in the application process and service
-	 * type definition. Reports an AlreadyExistingReportType error if it does.
-	 *
-	 * @return True: if the message type already exists in the definition.
-	 */
-	bool checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType, MessageTypeNum messageType) const;
 
 	/**
 	 * @return true if the maximum number of service type definitions per application process has been reached,
