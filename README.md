@@ -53,7 +53,7 @@ For more detailed installation instructions, including how to integrate with a m
 Merge requests also run `firmware-obc`, `firmware-adcs`, and `firmware-su`: those jobs
 `conan create` **this checkout** for ARM with each platform's `platform_definitions_path`,
 then compile firmware against the local package. They do **not** use published Artifactory
-`ecss-services/1.2`. The jobs are optional (`allow_failure`) and do not block merge; they
+`ecss-services`. The jobs are optional (`allow_failure`) and do not block merge; they
 may fail for unrelated firmware, XPS, or ATSAM reasons.
 
 ### From the Command Line (CLI)

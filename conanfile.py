@@ -5,10 +5,10 @@ from pathlib import Path
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout
 from conan.tools.files import copy
+from conan.tools.scm import Git
 
 class ECSSServicesRecipe(ConanFile):
     name = "ecss-services"
-    version = "1.2"
     revision_mode = "scm"
 
     # Optional metadata
@@ -26,6 +26,11 @@ class ECSSServicesRecipe(ConanFile):
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*", "inc/*"
     generators = "CMakeDeps"
+
+    def set_version(self):
+        if not self.version:
+            merges = Git(self, self.recipe_folder).run("rev-list --count --first-parent HEAD")
+            self.version = f"1.2.{merges}"
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -76,6 +81,6 @@ class ECSSServicesRecipe(ConanFile):
 
     def requirements(self):
         self.requires("etl/20.37.2", transitive_headers=True)
-        self.requires("logger/1.1", transitive_headers=True)
+        self.requires("logger/[~1.1]", transitive_headers=True)
         if self.settings.arch != 'armv7':
             self.requires("catch2/3.3.1")
