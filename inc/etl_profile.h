@@ -1,7 +1,7 @@
 /**
  * Configuration for the ETL standard library replacement
  *
- * Packaged with the library headers, so it also applies to code that uses them.
+ * Firmware compiles ETL with this profile too.
  */
 
 #ifndef ECSS_SERVICES_ETL_PROFILE_H
